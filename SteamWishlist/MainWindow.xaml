@@ -27,5 +27,6 @@
         <TextBox x:Name="txtTheirProfile5" HorizontalAlignment="Left" Height="23" Margin="415,170,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="492" Grid.ColumnSpan="2"/>
         <Label x:Name="label3" Content="Shared games" HorizontalAlignment="Left" Margin="10,208,0,0" VerticalAlignment="Top"/>
         <local:GamesGrid x:Name="gamesGrid" Margin="10,234,10,10" Grid.RowSpan="3" Grid.ColumnSpan="2" />
+        <Label x:Name="lblLoading" Content="LOADING..." HorizontalAlignment="Left" Margin="116,137,0,0" VerticalAlignment="Top" FontSize="18.667" FontWeight="Bold" Background="{x:Null}" Foreground="Red" Visibility="Hidden"/>
     </Grid>
 </Window>

@@ -40,6 +40,7 @@ namespace SteamWishlist
         private async void txtMyProfile_LostFocus(object sender, RoutedEventArgs e)
         {
             Task<IEnumerable<SteamGame>> task = _wishlistRetriever.GetWishlist(txtMyProfile.Text);
+            lblLoading.Visibility = Visibility.Visible;
             _awaitingTasks.Add(task);
             _wishlist = (await task).ToList();
             _awaitingTasks.Remove(task);
@@ -52,6 +53,7 @@ namespace SteamWishlist
             //TODO: Remove games list when a URL is overwritten
             //TODO: Generalize for other textboxes
             Task<IEnumerable<SteamGame>> task = _gamesRetriever.GetOwnedGames(txtTheirProfile1.Text);
+            lblLoading.Visibility = Visibility.Visible;
             _awaitingTasks.Add(task);
             var games = (await task).ToList();
             _awaitingTasks.Remove(task);
@@ -63,7 +65,13 @@ namespace SteamWishlist
 
         private void RefreshGrid()
         {
-            if (!_wishlist.Any() || !_games.Any() || _awaitingTasks.Any())
+            if (_awaitingTasks.Any())
+            {
+                return;
+            }
+
+            lblLoading.Visibility = Visibility.Hidden;
+            if (!_wishlist.Any() || !_games.Any())
             {
                 return;
             }
