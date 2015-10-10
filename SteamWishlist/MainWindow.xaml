@@ -26,7 +26,6 @@
         <TextBox x:Name="txtTheirProfile4" HorizontalAlignment="Left" Height="23" Margin="415,142,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="492" Grid.ColumnSpan="2"/>
         <TextBox x:Name="txtTheirProfile5" HorizontalAlignment="Left" Height="23" Margin="415,170,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="492" Grid.ColumnSpan="2"/>
         <Label x:Name="label3" Content="Shared games" HorizontalAlignment="Left" Margin="10,208,0,0" VerticalAlignment="Top"/>
-        <DataGrid x:Name="gridSharedGames" Margin="10,234,10,10" Grid.RowSpan="3" Grid.ColumnSpan="2"/>
-
+        <local:GamesGrid x:Name="gamesGrid" Margin="10,234,10,10" Grid.RowSpan="3" Grid.ColumnSpan="2" />
     </Grid>
 </Window>

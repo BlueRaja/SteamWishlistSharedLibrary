@@ -22,32 +22,54 @@ namespace SteamWishlist
     {
         private SteamWishlistRetriever _wishlistRetriever;
         private SteamOwnedGamesRetriever _gamesRetriever;
+
         private IEnumerable<SteamGame> _wishlist;
-        private IEnumerable<SteamGame> _games; 
+        private IList<IEnumerable<SteamGame>> _games;
+
+        private List<Task> _awaitingTasks;
 
         public MainWindow()
         {
             InitializeComponent();
             _wishlistRetriever = new SteamWishlistRetriever();
             _gamesRetriever = new SteamOwnedGamesRetriever();
+            _awaitingTasks = new List<Task>();
+            _games = new List<IEnumerable<SteamGame>>();
         }
 
         private async void txtMyProfile_LostFocus(object sender, RoutedEventArgs e)
         {
-            _wishlist = (await _wishlistRetriever.GetWishlist(txtMyProfile.Text)).ToList();
-            foreach (SteamGame game in _wishlist)
-            {
-                Console.WriteLine(game.ToString());
-            }
+            Task<IEnumerable<SteamGame>> task = _wishlistRetriever.GetWishlist(txtMyProfile.Text);
+            _awaitingTasks.Add(task);
+            _wishlist = (await task).ToList();
+            _awaitingTasks.Remove(task);
+
+            RefreshGrid();
         }
 
         private async void txtTheirProfile1_LostFocus(object sender, RoutedEventArgs e)
         {
-            _games = (await _gamesRetriever.GetOwnedGames(txtTheirProfile1.Text)).ToList();
-            foreach(SteamGame game in _games)
+            //TODO: Remove games list when a URL is overwritten
+            //TODO: Generalize for other textboxes
+            Task<IEnumerable<SteamGame>> task = _gamesRetriever.GetOwnedGames(txtTheirProfile1.Text);
+            _awaitingTasks.Add(task);
+            var games = (await task).ToList();
+            _awaitingTasks.Remove(task);
+
+            _games.Add(games);
+
+            RefreshGrid();
+        }
+
+        private void RefreshGrid()
+        {
+            if (!_wishlist.Any() || !_games.Any() || _awaitingTasks.Any())
             {
-                Console.WriteLine(game.ToString());
+                return;
             }
+
+            var allOwnedGames = _games.SelectMany(o => o).Distinct();
+            gamesGrid.GamesList = _wishlist.Intersect(allOwnedGames); ;
         }
     }
 }
