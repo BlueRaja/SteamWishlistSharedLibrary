@@ -5,8 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SteamWishlist"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="462.462" Width="525">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="328*"/>
+            <RowDefinition/>
+            <RowDefinition Height="103*"/>
+        </Grid.RowDefinitions>
+        <Label x:Name="label" Content="1. Enter your Steam profile" HorizontalAlignment="Left" Margin="10,27,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="label1" Content="2. Enter the Steam profiles of everyone" HorizontalAlignment="Left" Margin="246,10,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="label2" Content="who is library sharing with you" HorizontalAlignment="Left" Margin="261,27,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="txtMyProfile" HorizontalAlignment="Left" Height="23" Margin="10,58,0,0" TextWrapping="Wrap" Text="http://www.steamcommunity.com/id/MYID" VerticalAlignment="Top" Width="231"/>
+        <TextBox x:Name="txtTheirProfile1" HorizontalAlignment="Left" Height="23" Margin="246,58,0,0" TextWrapping="Wrap" Text="http://www.steamcommunity.com/id/FRIEND_1" VerticalAlignment="Top" Width="254"/>
+        <TextBox x:Name="txtTheirProfile2" HorizontalAlignment="Left" Height="23" Margin="246,86,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="254"/>
+        <TextBox x:Name="txtTheirProfile3" HorizontalAlignment="Left" Height="23" Margin="246,114,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="254"/>
+        <TextBox x:Name="txtTheirProfile4" HorizontalAlignment="Left" Height="23" Margin="246,142,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="254"/>
+        <TextBox x:Name="txtTheirProfile5" HorizontalAlignment="Left" Height="23" Margin="246,170,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="254"/>
+        <Label x:Name="label3" Content="Shared games" HorizontalAlignment="Left" Margin="10,208,0,0" VerticalAlignment="Top"/>
+        <DataGrid x:Name="gridSharedGames" Margin="10,234,10,10" Grid.RowSpan="3"/>
+
     </Grid>
 </Window>
