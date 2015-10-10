@@ -20,9 +20,34 @@ namespace SteamWishlist
     /// </summary>
     public partial class MainWindow : Window
     {
+        private SteamWishlistRetriever _wishlistRetriever;
+        private SteamOwnedGamesRetriever _gamesRetriever;
+        private IEnumerable<SteamGame> _wishlist;
+        private IEnumerable<SteamGame> _games; 
+
         public MainWindow()
         {
             InitializeComponent();
+            _wishlistRetriever = new SteamWishlistRetriever();
+            _gamesRetriever = new SteamOwnedGamesRetriever();
+        }
+
+        private async void txtMyProfile_LostFocus(object sender, RoutedEventArgs e)
+        {
+            _wishlist = (await _wishlistRetriever.GetWishlist(txtMyProfile.Text)).ToList();
+            foreach (SteamGame game in _wishlist)
+            {
+                Console.WriteLine(game.ToString());
+            }
+        }
+
+        private async void txtTheirProfile1_LostFocus(object sender, RoutedEventArgs e)
+        {
+            _games = (await _gamesRetriever.GetOwnedGames(txtTheirProfile1.Text)).ToList();
+            foreach(SteamGame game in _games)
+            {
+                Console.WriteLine(game.ToString());
+            }
         }
     }
 }
