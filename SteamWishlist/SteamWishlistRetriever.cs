@@ -10,15 +10,19 @@ namespace SteamWishlist
 {
     public class SteamWishlistRetriever
     {
+        private readonly WebClient _webClient;
+
+        public SteamWishlistRetriever(WebClient webClient)
+        {
+            _webClient = webClient;
+        }
+
         public async Task<IEnumerable<SteamGame>> GetWishlist(string profileUrl)
         {
             Uri wishlistUrl = new Uri(profileUrl).Append("wishlist");
-            using(WebClient client = new WebClient())
-            {
-                string wishlistHtml = await client.DownloadStringTaskAsync(wishlistUrl);
-                CQ wishlistDom = CQ.Create(wishlistHtml);
-                return ParseWishlistPage(wishlistDom);
-            }
+            string wishlistHtml = await _webClient.DownloadStringTaskAsync(wishlistUrl);
+            CQ wishlistDom = CQ.Create(wishlistHtml);
+            return ParseWishlistPage(wishlistDom);
         }
 
         private IEnumerable<SteamGame> ParseWishlistPage(CQ dom)

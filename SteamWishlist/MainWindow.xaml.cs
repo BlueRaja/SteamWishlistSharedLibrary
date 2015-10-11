@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -31,8 +32,10 @@ namespace SteamWishlist
         public MainWindow()
         {
             InitializeComponent();
-            _wishlistRetriever = new SteamWishlistRetriever();
-            _gamesRetriever = new SteamOwnedGamesRetriever();
+
+            WebClient webClient = new WebClient { Proxy = null }; //See http://stackoverflow.com/questions/4415443 - ugh.
+            _wishlistRetriever = new SteamWishlistRetriever(webClient);
+            _gamesRetriever = new SteamOwnedGamesRetriever(webClient);
             _awaitingTasks = new List<Task>();
             _games = new List<IEnumerable<SteamGame>>();
         }
