@@ -24,6 +24,7 @@ namespace SteamWishlist
         public string Name { get; }
         public string Url { get; }
         public int AppId { get; }
+        public string SteamInstallLink => @"steam://install/" + AppId;
 
         private static int GetAppId(string url)
         {

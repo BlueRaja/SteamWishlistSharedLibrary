@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,11 +21,27 @@ namespace SteamWishlist
     /// </summary>
     public partial class GamesGrid : UserControl
     {
+        private IEnumerable<SteamGame> _gamesList;
+
+        public IEnumerable<SteamGame> GamesList
+        {
+            get { return _gamesList; }
+            set
+            {
+                _gamesList = value.OrderBy(o => o.Name).ToList();
+                dataGrid.ItemsSource = _gamesList;
+            }
+        }
+
         public GamesGrid()
         {
             InitializeComponent();
         }
 
-        public IEnumerable<SteamGame> GamesList { get; set; } 
+        private void DG_Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            Hyperlink link = (Hyperlink)e.OriginalSource;
+            Process.Start(link.NavigateUri.AbsoluteUri);
+        }
     }
 }
