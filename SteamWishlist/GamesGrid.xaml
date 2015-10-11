@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <DataGrid x:Name="dataGrid" AutoGenerateColumns="False" >
+        <DataGrid x:Name="dataGrid" AutoGenerateColumns="False" CanUserSortColumns="False" SelectionUnit="Cell" SelectionMode="Single" AreRowDetailsFrozen="True" CanUserResizeRows="False" >
             <DataGrid.Columns>
                 <DataGridHyperlinkColumn ClipboardContentBinding="{x:Null}" Binding="{Binding Url}" ContentBinding="{Binding Name}" Header="Name">
                     <DataGridHyperlinkColumn.ElementStyle>
