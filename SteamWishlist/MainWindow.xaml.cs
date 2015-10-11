@@ -48,11 +48,11 @@ namespace SteamWishlist
             RefreshGrid();
         }
 
-        private async void txtTheirProfile1_LostFocus(object sender, RoutedEventArgs e)
+        private async void txtTheirProfile_LostFocus(object sender, RoutedEventArgs e)
         {
             //TODO: Remove games list when a URL is overwritten
-            //TODO: Generalize for other textboxes
-            Task<IEnumerable<SteamGame>> task = _gamesRetriever.GetOwnedGames(txtTheirProfile1.Text);
+            TextBox textBox = (TextBox) sender;
+            Task<IEnumerable<SteamGame>> task = _gamesRetriever.GetOwnedGames(textBox.Text);
             lblLoading.Visibility = Visibility.Visible;
             _awaitingTasks.Add(task);
             var games = (await task).ToList();
@@ -77,7 +77,8 @@ namespace SteamWishlist
             }
 
             var allOwnedGames = _games.SelectMany(o => o).Distinct();
-            gamesGrid.GamesList = _wishlist.Intersect(allOwnedGames); ;
+            gamesGrid.GamesList = _wishlist.Intersect(allOwnedGames);
+            lblSharedGames.Content = $"Shared games - {gamesGrid.GamesList.Count()} found";
         }
     }
 }
