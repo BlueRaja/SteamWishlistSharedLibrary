@@ -44,26 +44,36 @@ namespace SteamWishlist
         {
             Task<SteamGamesList> task = _wishlistRetriever.GetWishlist(txtMyProfile.Text);
             lblLoading.Visibility = Visibility.Visible;
-            _awaitingTasks.Add(task);
-            _wishlist = await task;
-            _awaitingTasks.Remove(task);
+            _wishlist = await KeepTrackOfTasks(task);
 
             RefreshGrid();
         }
 
         private async void txtTheirProfile_LostFocus(object sender, RoutedEventArgs e)
         {
-            //TODO: Remove games list when a URL is overwritten
             TextBox textBox = (TextBox) sender;
-            Task<SteamGamesList> task = _gamesRetriever.GetOwnedGames(textBox.Text);
             lblLoading.Visibility = Visibility.Visible;
-            _awaitingTasks.Add(task);
-            var games = await task;
-            _awaitingTasks.Remove(task);
 
+            Task<SteamGamesList> task = _gamesRetriever.GetOwnedGames(textBox.Text);
+            var games = await KeepTrackOfTasks(task);
+
+            if (textBox.Tag != null)
+            {
+                _sharedGames.Remove((SteamGamesList) textBox.Tag);
+            }
+            textBox.Tag = games;
             _sharedGames.Add(games);
 
             RefreshGrid();
+        }
+
+        private async Task<T> KeepTrackOfTasks<T>(Task<T> task)
+        {
+            _awaitingTasks.Add(task);
+            var returnVal = await task;
+            _awaitingTasks.Remove(task);
+
+            return returnVal;
         }
 
         private void RefreshGrid()
