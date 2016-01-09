@@ -21,6 +21,9 @@ namespace SteamWishlist
     /// </summary>
     public partial class MainWindow : Window
     {
+        //TODO: Fix alignment when going full-screen
+        //TODO: Handle exceptions thrown by WebBrowser
+        //TODO: Save values entered
         private SteamGamesList _wishlist;
 
         private readonly IList<SteamGamesList> _sharedGames;
