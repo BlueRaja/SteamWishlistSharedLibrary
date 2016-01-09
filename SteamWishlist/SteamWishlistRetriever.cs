@@ -12,9 +12,9 @@ namespace SteamWishlist
     {
         private readonly WebClient _webClient;
 
-        public SteamWishlistRetriever(WebClient webClient)
+        public SteamWishlistRetriever()
         {
-            _webClient = webClient;
+            _webClient = new WebClient { Proxy = null }; //See http://stackoverflow.com/questions/4415443 - ugh.;
         }
 
         public async Task<SteamGamesList> GetWishlist(string profileUrl)

@@ -22,7 +22,6 @@ namespace SteamWishlist
     public partial class MainWindow : Window
     {
         //TODO: Handle exceptions thrown by WebBrowser
-        //TODO: Save values entered
         private const string DefaultTextMySteamProfile = "http://www.steamcommunity.com/id/MYID";
         private const string DefaultTextTheirSteamProfile = "http://www.steamcommunity.com/id/FRIEND";
 
@@ -39,9 +38,8 @@ namespace SteamWishlist
         {
             InitializeComponent();
 
-            WebClient webClient = new WebClient { Proxy = null }; //See http://stackoverflow.com/questions/4415443 - ugh.
-            _wishlistRetriever = new SteamWishlistRetriever(webClient);
-            _gamesRetriever = new SteamOwnedGamesRetriever(webClient);
+            _wishlistRetriever = new SteamWishlistRetriever();
+            _gamesRetriever = new SteamOwnedGamesRetriever();
             _profileUrlValidator = new SteamProfileUrlValidator();
             _awaitingTasks = new List<Task>();
             _sharedGames = new List<SteamGamesList>();
