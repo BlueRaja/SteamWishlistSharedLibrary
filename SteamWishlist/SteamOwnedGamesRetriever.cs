@@ -18,12 +18,13 @@ namespace SteamWishlist
             _webClient = webClient;
         }
 
-        public async Task<IEnumerable<SteamGame>> GetOwnedGames(string profileUrl)
+        public async Task<SteamGamesList> GetOwnedGames(string profileUrl)
         {
-            Uri gamesUrl = new Uri(profileUrl).Append("games/?xml=1");
+            Uri gamesUrl = new UriBuilder(profileUrl).Uri.Append("games/?xml=1");
             string gamesXml = await _webClient.DownloadStringTaskAsync(gamesUrl);
             XDocument root = XDocument.Parse(gamesXml);
-            return ParseGamesXml(root);
+            IEnumerable<SteamGame> gamesList = ParseGamesXml(root);
+            return new SteamGamesList(gamesUrl, gamesList);
         }
 
         private IEnumerable<SteamGame> ParseGamesXml(XDocument root)

@@ -24,8 +24,8 @@ namespace SteamWishlist
         private SteamWishlistRetriever _wishlistRetriever;
         private SteamOwnedGamesRetriever _gamesRetriever;
 
-        private IEnumerable<SteamGame> _wishlist;
-        private IList<IEnumerable<SteamGame>> _games;
+        private SteamGamesList _wishlist;
+        private IList<SteamGamesList> _sharedGames;
 
         private List<Task> _awaitingTasks;
 
@@ -37,15 +37,15 @@ namespace SteamWishlist
             _wishlistRetriever = new SteamWishlistRetriever(webClient);
             _gamesRetriever = new SteamOwnedGamesRetriever(webClient);
             _awaitingTasks = new List<Task>();
-            _games = new List<IEnumerable<SteamGame>>();
+            _sharedGames = new List<SteamGamesList>();
         }
 
         private async void txtMyProfile_LostFocus(object sender, RoutedEventArgs e)
         {
-            Task<IEnumerable<SteamGame>> task = _wishlistRetriever.GetWishlist(txtMyProfile.Text);
+            Task<SteamGamesList> task = _wishlistRetriever.GetWishlist(txtMyProfile.Text);
             lblLoading.Visibility = Visibility.Visible;
             _awaitingTasks.Add(task);
-            _wishlist = (await task).ToList();
+            _wishlist = await task;
             _awaitingTasks.Remove(task);
 
             RefreshGrid();
@@ -55,13 +55,13 @@ namespace SteamWishlist
         {
             //TODO: Remove games list when a URL is overwritten
             TextBox textBox = (TextBox) sender;
-            Task<IEnumerable<SteamGame>> task = _gamesRetriever.GetOwnedGames(textBox.Text);
+            Task<SteamGamesList> task = _gamesRetriever.GetOwnedGames(textBox.Text);
             lblLoading.Visibility = Visibility.Visible;
             _awaitingTasks.Add(task);
-            var games = (await task).ToList();
+            var games = await task;
             _awaitingTasks.Remove(task);
 
-            _games.Add(games);
+            _sharedGames.Add(games);
 
             RefreshGrid();
         }
@@ -74,12 +74,12 @@ namespace SteamWishlist
             }
 
             lblLoading.Visibility = Visibility.Hidden;
-            if (!_wishlist.Any() || !_games.Any())
+            if (!_wishlist.Any() || !_sharedGames.Any())
             {
                 return;
             }
 
-            var allOwnedGames = _games.SelectMany(o => o).Distinct();
+            var allOwnedGames = _sharedGames.SelectMany(o => o).Distinct();
             gamesGrid.GamesList = _wishlist.Intersect(allOwnedGames);
             lblSharedGames.Content = $"Shared games - {gamesGrid.GamesList.Count()} found";
         }
