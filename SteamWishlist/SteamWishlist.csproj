@@ -66,6 +66,7 @@
     <Compile Include="SteamGame.cs" />
     <Compile Include="SteamGamesList.cs" />
     <Compile Include="SteamOwnedGamesRetriever.cs" />
+    <Compile Include="SteamProfileUrlValidator.cs" />
     <Compile Include="SteamWishlistRetriever.cs" />
     <Compile Include="UriExtensions.cs" />
     <Page Include="GamesGrid.xaml">

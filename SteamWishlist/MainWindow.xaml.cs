@@ -28,6 +28,7 @@ namespace SteamWishlist
         private readonly SteamWishlistRetriever _wishlistRetriever;
         private readonly SteamOwnedGamesRetriever _gamesRetriever;
         private readonly IEnumerable<TextBox> _theirProfileTextboxes;
+        private readonly SteamProfileUrlValidator _profileUrlValidator;
 
         private const string DefaultTextMySteamProfile = "http://www.steamcommunity.com/id/MYID";
         private const string DefaultTextTheirSteamProfile = "http://www.steamcommunity.com/id/FRIEND";
@@ -39,6 +40,7 @@ namespace SteamWishlist
             WebClient webClient = new WebClient { Proxy = null }; //See http://stackoverflow.com/questions/4415443 - ugh.
             _wishlistRetriever = new SteamWishlistRetriever(webClient);
             _gamesRetriever = new SteamOwnedGamesRetriever(webClient);
+            _profileUrlValidator = new SteamProfileUrlValidator();
             _awaitingTasks = new List<Task>();
             _sharedGames = new List<SteamGamesList>();
             _theirProfileTextboxes = new[] {txtTheirProfile1, txtTheirProfile2, txtTheirProfile3, txtTheirProfile3, txtTheirProfile4, txtTheirProfile5};
@@ -60,9 +62,14 @@ namespace SteamWishlist
 
         private async void txtMyProfile_LostKeyboardFocus(object sender, RoutedEventArgs e)
         {
-            Task<SteamGamesList> task = _wishlistRetriever.GetWishlist(txtMyProfile.Text);
-            lblLoading.Visibility = Visibility.Visible;
-            _wishlist = await KeepTrackOfTasks(task);
+            _wishlist = null;
+
+            if (_profileUrlValidator.IsValidSteamProfileUrl(txtMyProfile.Text))
+            {
+                lblLoading.Visibility = Visibility.Visible;
+                Task<SteamGamesList> task = _wishlistRetriever.GetWishlist(txtMyProfile.Text);
+                _wishlist = await KeepTrackOfTasks(task);
+            }
 
             RefreshGrid();
         }
@@ -81,17 +88,22 @@ namespace SteamWishlist
         private async void txtTheirProfile_LostKeyboardFocus(object sender, RoutedEventArgs e)
         {
             TextBox textBox = (TextBox) sender;
-            lblLoading.Visibility = Visibility.Visible;
-
-            Task<SteamGamesList> task = _gamesRetriever.GetOwnedGames(textBox.Text);
-            var games = await KeepTrackOfTasks(task);
-
-            if (textBox.Tag != null)
+            if(textBox.Tag != null)
             {
-                _sharedGames.Remove((SteamGamesList) textBox.Tag);
+                _sharedGames.Remove((SteamGamesList)textBox.Tag);
+                textBox.Tag = null;
             }
-            textBox.Tag = games;
-            _sharedGames.Add(games);
+
+            if (_profileUrlValidator.IsValidSteamProfileUrl(textBox.Text))
+            {
+                lblLoading.Visibility = Visibility.Visible;
+
+                Task<SteamGamesList> task = _gamesRetriever.GetOwnedGames(textBox.Text);
+                var games = await KeepTrackOfTasks(task);
+
+                textBox.Tag = games;
+                _sharedGames.Add(games);
+            }
 
             RefreshGrid();
         }
@@ -113,8 +125,9 @@ namespace SteamWishlist
             }
 
             lblLoading.Visibility = Visibility.Hidden;
-            if (!_wishlist.Any() || !_sharedGames.Any())
+            if (_wishlist == null || !_wishlist.Any() || !_sharedGames.Any())
             {
+                gamesGrid.Clear();
                 return;
             }
 

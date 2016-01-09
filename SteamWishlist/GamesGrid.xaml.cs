@@ -28,7 +28,7 @@ namespace SteamWishlist
             get { return _gamesList; }
             set
             {
-                _gamesList = value.OrderBy(o => o.Name).ToList();
+                _gamesList = value?.OrderBy(o => o.Name).ToList();
                 dataGrid.ItemsSource = _gamesList;
             }
         }
@@ -36,6 +36,11 @@ namespace SteamWishlist
         public GamesGrid()
         {
             InitializeComponent();
+        }
+
+        public void Clear()
+        {
+            GamesList = null;
         }
 
         private void DG_Hyperlink_Click(object sender, RoutedEventArgs e)
