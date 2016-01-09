@@ -69,6 +69,7 @@
     <Compile Include="SteamProfileUrlValidator.cs" />
     <Compile Include="SteamWishlistRetriever.cs" />
     <Compile Include="UriExtensions.cs" />
+    <Compile Include="UrlSaver.cs" />
     <Page Include="GamesGrid.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

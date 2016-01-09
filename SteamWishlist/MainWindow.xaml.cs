@@ -23,17 +23,17 @@ namespace SteamWishlist
     {
         //TODO: Handle exceptions thrown by WebBrowser
         //TODO: Save values entered
+        private const string DefaultTextMySteamProfile = "http://www.steamcommunity.com/id/MYID";
+        private const string DefaultTextTheirSteamProfile = "http://www.steamcommunity.com/id/FRIEND";
+
         private SteamGamesList _wishlist;
 
         private readonly IList<SteamGamesList> _sharedGames;
         private readonly List<Task> _awaitingTasks;
         private readonly SteamWishlistRetriever _wishlistRetriever;
         private readonly SteamOwnedGamesRetriever _gamesRetriever;
-        private readonly IEnumerable<TextBox> _theirProfileTextboxes;
+        private readonly IList<TextBox> _theirProfileTextboxes;
         private readonly SteamProfileUrlValidator _profileUrlValidator;
-
-        private const string DefaultTextMySteamProfile = "http://www.steamcommunity.com/id/MYID";
-        private const string DefaultTextTheirSteamProfile = "http://www.steamcommunity.com/id/FRIEND";
 
         public MainWindow()
         {
@@ -47,11 +47,17 @@ namespace SteamWishlist
             _sharedGames = new List<SteamGamesList>();
             _theirProfileTextboxes = new[] {txtTheirProfile1, txtTheirProfile2, txtTheirProfile3, txtTheirProfile3, txtTheirProfile4, txtTheirProfile5};
 
-            txtMyProfile.Text = DefaultTextMySteamProfile;
-            foreach (TextBox txtTheirProfile in _theirProfileTextboxes)
+            InitializeTextbox(txtMyProfile, UrlSaver.MySteamProfile, DefaultTextMySteamProfile);
+            for (int i = 0; i < _theirProfileTextboxes.Count; i++)
             {
-                txtTheirProfile.Text = DefaultTextTheirSteamProfile;
+                string savedValue = UrlSaver.TheirSteamProfiles.Skip(i).FirstOrDefault();
+                InitializeTextbox(_theirProfileTextboxes[i], savedValue, DefaultTextTheirSteamProfile);
             }
+        }
+
+        private void InitializeTextbox(TextBox textbox, string value, string defaultValue)
+        {
+            textbox.Text = String.IsNullOrWhiteSpace(value) ? defaultValue : value;
         }
 
         private void txtMyProfile_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
@@ -64,6 +70,8 @@ namespace SteamWishlist
 
         private async void txtMyProfile_LostKeyboardFocus(object sender, RoutedEventArgs e)
         {
+            UrlSaver.MySteamProfile = txtMyProfile.Text;
+
             _wishlist = null;
 
             if (_profileUrlValidator.IsValidSteamProfileUrl(txtMyProfile.Text))
@@ -89,6 +97,8 @@ namespace SteamWishlist
 
         private async void txtTheirProfile_LostKeyboardFocus(object sender, RoutedEventArgs e)
         {
+            UrlSaver.TheirSteamProfiles = _theirProfileTextboxes.Select(o => o.Text);
+
             TextBox textBox = (TextBox) sender;
             if(textBox.Tag != null)
             {

@@ -8,6 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace SteamWishlist.Properties {
     
     
@@ -20,6 +22,30 @@ namespace SteamWishlist.Properties {
         public static Settings Default {
             get {
                 return defaultInstance;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MyProfileUrl {
+            get {
+                return ((string)(this["MyProfileUrl"]));
+            }
+            set {
+                this["MyProfileUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TheirProfileUrls {
+            get {
+                return ((string)(this["TheirProfileUrls"]));
+            }
+            set {
+                this["TheirProfileUrls"] = value;
             }
         }
     }
