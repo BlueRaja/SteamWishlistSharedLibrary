@@ -21,13 +21,16 @@ namespace SteamWishlist
     /// </summary>
     public partial class MainWindow : Window
     {
-        private SteamWishlistRetriever _wishlistRetriever;
-        private SteamOwnedGamesRetriever _gamesRetriever;
-
         private SteamGamesList _wishlist;
-        private IList<SteamGamesList> _sharedGames;
 
-        private List<Task> _awaitingTasks;
+        private readonly IList<SteamGamesList> _sharedGames;
+        private readonly List<Task> _awaitingTasks;
+        private readonly SteamWishlistRetriever _wishlistRetriever;
+        private readonly SteamOwnedGamesRetriever _gamesRetriever;
+        private readonly IEnumerable<TextBox> _theirProfileTextboxes;
+
+        private const string DefaultTextMySteamProfile = "http://www.steamcommunity.com/id/MYID";
+        private const string DefaultTextTheirSteamProfile = "http://www.steamcommunity.com/id/FRIEND";
 
         public MainWindow()
         {
@@ -38,9 +41,24 @@ namespace SteamWishlist
             _gamesRetriever = new SteamOwnedGamesRetriever(webClient);
             _awaitingTasks = new List<Task>();
             _sharedGames = new List<SteamGamesList>();
+            _theirProfileTextboxes = new[] {txtTheirProfile1, txtTheirProfile2, txtTheirProfile3, txtTheirProfile3, txtTheirProfile4, txtTheirProfile5};
+
+            txtMyProfile.Text = DefaultTextMySteamProfile;
+            foreach (TextBox txtTheirProfile in _theirProfileTextboxes)
+            {
+                txtTheirProfile.Text = DefaultTextTheirSteamProfile;
+            }
         }
 
-        private async void txtMyProfile_LostFocus(object sender, RoutedEventArgs e)
+        private void txtMyProfile_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (txtMyProfile.Text == DefaultTextMySteamProfile)
+            {
+                txtMyProfile.Clear();
+            }
+        }
+
+        private async void txtMyProfile_LostKeyboardFocus(object sender, RoutedEventArgs e)
         {
             Task<SteamGamesList> task = _wishlistRetriever.GetWishlist(txtMyProfile.Text);
             lblLoading.Visibility = Visibility.Visible;
@@ -49,7 +67,18 @@ namespace SteamWishlist
             RefreshGrid();
         }
 
-        private async void txtTheirProfile_LostFocus(object sender, RoutedEventArgs e)
+        private void txtTheirProfile_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            foreach(TextBox txtTheirProfile in _theirProfileTextboxes)
+            {
+                if (txtTheirProfile.Text == DefaultTextTheirSteamProfile)
+                {
+                    txtTheirProfile.Clear();
+                }
+            }
+        }
+
+        private async void txtTheirProfile_LostKeyboardFocus(object sender, RoutedEventArgs e)
         {
             TextBox textBox = (TextBox) sender;
             lblLoading.Visibility = Visibility.Visible;
