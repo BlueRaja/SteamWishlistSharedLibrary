@@ -22,13 +22,14 @@ namespace SteamWishlist
     public partial class MainWindow : Window
     {
         //TODO: Handle exceptions thrown by WebBrowser
-        private const string DefaultTextMySteamProfile = "http://www.steamcommunity.com/id/MYID";
-        private const string DefaultTextTheirSteamProfile = "http://www.steamcommunity.com/id/FRIEND";
+        private const string DefaultTextMySteamProfile = "ex: http://www.steamcommunity.com/id/MYID";
+        private const string DefaultTextTheirSteamProfile = "ex: http://www.steamcommunity.com/id/FRIEND";
 
         private SteamGamesList _wishlist;
+        private IList<SteamGamesList> _sharedGames;
+        private bool _isLoading;
+        private bool _isInitializing;
 
-        private readonly IList<SteamGamesList> _sharedGames;
-        private readonly List<Task> _awaitingTasks;
         private readonly SteamWishlistRetriever _wishlistRetriever;
         private readonly SteamOwnedGamesRetriever _gamesRetriever;
         private readonly IList<TextBox> _theirProfileTextboxes;
@@ -36,12 +37,12 @@ namespace SteamWishlist
 
         public MainWindow()
         {
+            _isInitializing = true;
             InitializeComponent();
 
             _wishlistRetriever = new SteamWishlistRetriever();
             _gamesRetriever = new SteamOwnedGamesRetriever();
             _profileUrlValidator = new SteamProfileUrlValidator();
-            _awaitingTasks = new List<Task>();
             _sharedGames = new List<SteamGamesList>();
             _theirProfileTextboxes = new[] {txtTheirProfile1, txtTheirProfile2, txtTheirProfile3, txtTheirProfile3, txtTheirProfile4, txtTheirProfile5};
 
@@ -51,6 +52,9 @@ namespace SteamWishlist
                 string savedValue = UrlSaver.TheirSteamProfiles.Skip(i).FirstOrDefault();
                 InitializeTextbox(_theirProfileTextboxes[i], savedValue, DefaultTextTheirSteamProfile);
             }
+            _isInitializing = false;
+
+            RefreshGamesLists();
         }
 
         private void InitializeTextbox(TextBox textbox, string value, string defaultValue)
@@ -66,22 +70,6 @@ namespace SteamWishlist
             }
         }
 
-        private async void txtMyProfile_LostKeyboardFocus(object sender, RoutedEventArgs e)
-        {
-            UrlSaver.MySteamProfile = txtMyProfile.Text;
-
-            _wishlist = null;
-
-            if (_profileUrlValidator.IsValidSteamProfileUrl(txtMyProfile.Text))
-            {
-                lblLoading.Visibility = Visibility.Visible;
-                Task<SteamGamesList> task = _wishlistRetriever.GetWishlist(txtMyProfile.Text);
-                _wishlist = await KeepTrackOfTasks(task);
-            }
-
-            RefreshGrid();
-        }
-
         private void txtTheirProfile_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             foreach(TextBox txtTheirProfile in _theirProfileTextboxes)
@@ -93,48 +81,64 @@ namespace SteamWishlist
             }
         }
 
-        private async void txtTheirProfile_LostKeyboardFocus(object sender, RoutedEventArgs e)
+        private void textbox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            UrlSaver.TheirSteamProfiles = _theirProfileTextboxes.Select(o => o.Text);
-
-            TextBox textBox = (TextBox) sender;
-            if(textBox.Tag != null)
+            if (!_isInitializing)
             {
-                _sharedGames.Remove((SteamGamesList)textBox.Tag);
-                textBox.Tag = null;
+                UrlSaver.MySteamProfile = txtMyProfile.Text;
+                UrlSaver.TheirSteamProfiles = _theirProfileTextboxes.Select(o => o.Text);
             }
 
-            if (_profileUrlValidator.IsValidSteamProfileUrl(textBox.Text))
-            {
-                lblLoading.Visibility = Visibility.Visible;
-
-                Task<SteamGamesList> task = _gamesRetriever.GetOwnedGames(textBox.Text);
-                var games = await KeepTrackOfTasks(task);
-
-                textBox.Tag = games;
-                _sharedGames.Add(games);
-            }
-
-            RefreshGrid();
+            SetLoadButtonEnabled();
         }
 
-        private async Task<T> KeepTrackOfTasks<T>(Task<T> task)
+        private bool IsReadyToLoad()
         {
-            _awaitingTasks.Add(task);
-            var returnVal = await task;
-            _awaitingTasks.Remove(task);
-
-            return returnVal;
+            return _profileUrlValidator.IsValidSteamProfileUrl(txtMyProfile.Text) &&
+                   _theirProfileTextboxes.Any(o => _profileUrlValidator.IsValidSteamProfileUrl(o.Text));
         }
 
-        private void RefreshGrid()
+        private void SetLoadButtonEnabled()
         {
-            if (_awaitingTasks.Any())
+            lblLoading.Visibility = (_isLoading ? Visibility.Visible : Visibility.Hidden);
+            btnLoad.IsEnabled = IsReadyToLoad() && !_isLoading;
+        }
+
+        private async Task RefreshGamesLists()
+        {
+            if (!IsReadyToLoad())
             {
                 return;
             }
 
-            lblLoading.Visibility = Visibility.Hidden;
+            _isLoading = true;
+            SetLoadButtonEnabled();
+
+            Task<SteamGamesList> wishlistTask = _wishlistRetriever.GetWishlist(txtMyProfile.Text);
+            IEnumerable<Task<SteamGamesList>> sharedGamesTasks = _theirProfileTextboxes.Select(o => o.Text)
+                .Where(_profileUrlValidator.IsValidSteamProfileUrl)
+                .Select(_gamesRetriever.GetOwnedGames);
+
+            _wishlist = await wishlistTask;
+            _sharedGames = await Task.WhenAll(sharedGamesTasks);
+            RefreshGrid();
+
+            _isLoading = false;
+            SetLoadButtonEnabled();
+        }
+
+        private async void btnLoad_Click(object sender, RoutedEventArgs e)
+        {
+            if(!IsReadyToLoad())
+            {
+                throw new Exception("This shouldn't happen, btnLoad_Click() should never be called when IsReadyToLoad() is false!");
+            }
+
+            await RefreshGamesLists();
+        }
+
+        private void RefreshGrid()
+        {
             if (_wishlist == null || !_wishlist.Any() || !_sharedGames.Any())
             {
                 gamesGrid.Clear();
