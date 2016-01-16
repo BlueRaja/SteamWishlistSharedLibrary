@@ -21,7 +21,6 @@ namespace SteamWishlist
     /// </summary>
     public partial class MainWindow : Window
     {
-        //TODO: Handle exceptions thrown by WebBrowser
         private const string DefaultTextMySteamProfile = "ex: http://www.steamcommunity.com/id/MYID";
         private const string DefaultTextTheirSteamProfile = "ex: http://www.steamcommunity.com/id/FRIEND";
 
@@ -122,9 +121,16 @@ namespace SteamWishlist
                 .Where(_profileUrlValidator.IsValidSteamProfileUrl)
                 .Select(_gamesRetriever.GetOwnedGames);
 
-            _wishlist = await wishlistTask;
-            _sharedGames = await Task.WhenAll(sharedGamesTasks);
-            RefreshGrid();
+            try
+            {
+                _wishlist = await wishlistTask;
+                _sharedGames = await Task.WhenAll(sharedGamesTasks);
+                RefreshGrid();
+            }
+            catch (Exception)
+            {
+                lblError.Visibility = Visibility.Visible;
+            }
 
             _isLoading = false;
             SetLoadButtonEnabled();
