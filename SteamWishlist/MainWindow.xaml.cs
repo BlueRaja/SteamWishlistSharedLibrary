@@ -89,6 +89,9 @@ namespace SteamWishlist
                 UrlSaver.TheirSteamProfiles = _theirProfileTextboxes.Select(o => o.Text);
             }
 
+            TextBox textbox = (TextBox) sender;
+            textbox.Foreground = (textbox.Text == DefaultTextTheirSteamProfile || textbox.Text == DefaultTextMySteamProfile ? Brushes.Gray : Brushes.Black);
+
             SetLoadButtonEnabled();
         }
 
