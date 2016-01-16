@@ -28,6 +28,6 @@
         <Label x:Name="lblSharedGames" Content="Shared games" HorizontalAlignment="Left" Margin="10,208,0,0" VerticalAlignment="Top"/>
         <local:GamesGrid x:Name="gamesGrid" Margin="10,234,10,10" Grid.RowSpan="3" Grid.ColumnSpan="2" />
         <Label x:Name="lblLoading" Content="LOADING..." HorizontalAlignment="Left" Margin="116,137,0,0" VerticalAlignment="Top" FontSize="18.667" FontWeight="Bold" Background="{x:Null}" Foreground="Red" Visibility="Hidden"/>
-        <Button x:Name="btnLoad" Content="3. Load!" Grid.Column="1" HorizontalAlignment="Left" Margin="312,198,0,0" VerticalAlignment="Top" Width="125" Click="btnLoad_Click"/>
+        <Button x:Name="btnLoad" Content="3. Load!" Grid.Column="1" Margin="0,198,35,0" VerticalAlignment="Top" Click="btnLoad_Click" HorizontalAlignment="Right" Width="125"/>
     </Grid>
 </Window>
