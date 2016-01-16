@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SteamWishlist"
         mc:Ignorable="d"
-        Title="MainWindow" Height="462.462" Width="962.237">
+        Title="Steam Wishlist Shared Library" Height="462.462" Width="962.237">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="441*"/>

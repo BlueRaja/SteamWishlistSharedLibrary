@@ -59,5 +59,15 @@ namespace SteamWishlist.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon Wishlist {
+            get {
+                object obj = ResourceManager.GetObject("Wishlist", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
     }
 }
