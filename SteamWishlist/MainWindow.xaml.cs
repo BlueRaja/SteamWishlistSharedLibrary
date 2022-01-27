@@ -116,7 +116,8 @@ namespace SteamWishlist
             _isLoading = true;
             SetLoadButtonEnabled();
 
-            Task<SteamGamesList> wishlistTask = _wishlistRetriever.GetWishlist(txtMyProfile.Text);
+            string userIdentifier = _profileUrlValidator.GetUserIdentifier(txtMyProfile.Text);
+            Task<SteamGamesList> wishlistTask = _wishlistRetriever.GetWishlist(userIdentifier);
             IEnumerable<Task<SteamGamesList>> sharedGamesTasks = _theirProfileTextboxes.Select(o => o.Text)
                 .Where(_profileUrlValidator.IsValidSteamProfileUrl)
                 .Select(_gamesRetriever.GetOwnedGames);

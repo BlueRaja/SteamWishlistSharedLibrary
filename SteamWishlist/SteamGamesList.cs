@@ -10,11 +10,9 @@ namespace SteamWishlist
     public class SteamGamesList : IEnumerable<SteamGame>
     {
         public IEnumerable<SteamGame> Games { get; }
-        public Uri OwnerUrl { get; }
 
-        public SteamGamesList(Uri ownerUrl, IEnumerable<SteamGame> games)
+        public SteamGamesList(IEnumerable<SteamGame> games)
         {
-            OwnerUrl = ownerUrl;
             Games = games.ToList();
         }
 

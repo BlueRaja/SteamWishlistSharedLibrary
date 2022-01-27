@@ -5,7 +5,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using CsQuery;
 
 namespace SteamWishlist
 {
@@ -20,16 +19,16 @@ namespace SteamWishlist
             XDocument root = XDocument.Parse(gamesXml);
             IEnumerable<SteamGame> gamesList = ParseGamesXml(root);
 
-            return new SteamGamesList(gamesUrl, gamesList);
+            return new SteamGamesList(gamesList);
         }
 
         private IEnumerable<SteamGame> ParseGamesXml(XDocument root)
         {
             foreach (XElement gameNode in root.Descendants("game"))
             {
+                long appId = long.Parse(RemoveCData(gameNode.Element("appID").Value));
                 string name = RemoveCData(gameNode.Element("name").Value);
-                string url = RemoveCData(gameNode.Element("storeLink").Value);
-                yield return new SteamGame(name, url);
+                yield return new SteamGame(appId, name);
             }
         }
 
